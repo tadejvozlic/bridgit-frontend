@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GameComponent } from './components/game/game.component';
 import { RouterModule, Routes } from '@angular/router';
+import { IterableNumberPipe } from './pipes/iterable-number.pipe';
 
 const routes: Routes = [
   { path: 'play', component: GameComponent },
@@ -13,7 +14,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    GameComponent
+    GameComponent,
+    IterableNumberPipe
   ],
   imports: [
     BrowserModule,

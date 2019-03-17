@@ -1,45 +1,52 @@
+
 // .container {
 //   margin: 64px auto;
-//   width: 800px;
-//   height: 800px;
+//   width: 600px;
+//   height: 600px;
 //   background-color: whitesmoke;
 //   text-align: center;
 //   border: 1px solid;
 //   border-radius: 6px;
 //   box-shadow: 0 1px 6px, 0 1px 12px white;
 // }
-.container {
+.board {
   margin: 64px auto;
-  width: 800px;
-  height: 800px;
+  width: 600px;
+  height: 600px;
   background-color: whitesmoke;
   text-align: center;
   border: 1px solid;
   border-radius: 6px;
   box-shadow: 0 1px 6px, 0 1px 12px white;
 }
-canvas {
-  // width: 800px;
-  // height: 800px;
+.tile {
+  width: 51px;
+  height: 51px;
+  // outline: 1px solid;
+  float: left;
 }
-.centered{
+.tile-content {
 
+  float: left;
+}
+%node {
+  border-radius: 50%;
+}
+.blueNode {
+  @extend %node;
+  background-color: blue;
+}
+.redNode {
+  @extend %node;
+  background-color: red;
+}
+.blueBridge {
+  background-color: blue;
+}
+.redBridge {
+  background-color: red;
 }
 
-// .node {
-//   height: 25px;
-//   width: 25px;
-//   border-radius: 50%;
-//   display: inline-block;
-
-//   &-blue {
-//     background-color: blue;
-//   }
-//   &-red {
-//     background: red;
-//   }
-
-// }
 .node-blue {
   height: 25px;
   width: 25px;

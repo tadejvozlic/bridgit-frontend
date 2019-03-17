@@ -1,7 +1,21 @@
 <div class="container">
-  <canvas  height="800" width="800" id="board" >
+  <div class="board">
+    <div *ngFor="let i of 2*size + 1 | iterableNumber">
+      <div class="tile" *ngFor="let j of 2*size + 1 | iterableNumber" [ngClass]="{
+        blueNode: check_if_blue_node(i,j),
+        redNode: check_if_red_node(i,j),
+        blueBridge: check_if_blue_bridge(i,j),
+        redBridge: check_if_red_bridge(i,j)
+      }" (click)="move(i,j)" >
+      <!-- <p>{{i +  '/' + j}}</p> -->
+      <!-- <p >{{blueCount}}</p> -->
+      <!-- <p *ngIf="check_if_red_node(i,j)">{{redCount}}</p> -->
+      </div>
+    </div>
+  </div>
+  <!-- <canvas #canvas  height="800" width="800" id="board" >
 
-  </canvas>
+  </canvas> -->
   <!-- <ng-container *ngIf="blueNodes && redNodes">
       <div *ngFor="let blueNode of blueNodes; let i = index">
           <span class="node-blue"></span>
@@ -9,4 +23,5 @@
         </div>
   </ng-container> -->
 </div>
-<button (click)="update()">test</button>
+<button (click)="getIndexes()">asasasas</button>
+
