@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { checkAndUpdateBinding } from '@angular/core/src/view/util';
 
 @Component({
   selector: 'app-game',
@@ -83,33 +84,86 @@ export class GameComponent implements OnInit {
      }
   }
   move(i: number, j: number) {
-    if (!this.check_if_blue_node(i,j) && !this.check_if_red_node(i,j)) {
-      if (this.player === 1) {
-        this.blueBridges.push({'i':i,'j': j});
-      } else {
-        this.redBridges.push({'i':i,'j': j});
-      }
+    if (!this.check_if_blue_node(i, j) && !this.check_if_red_node(i, j)) {
+      this.addBridge(i, j, this.player);
+      // if (this.player === 1) {
+      //   this.blueBridges.push({'i':i,'j': j, 'node1':});
+      // } else {
+      //   this.redBridges.push({'i':i,'j': j});
+      // }
+      if (this.checkIfPlayerWon(this.player)) {
+      console.log('player', this.player, ' won');
+    } else {
       this.changePlayer();
+      }
+    }
+  }
+  addBridge(i: number, j: number, player) {
+    if (this.check_if_blue_bridge(i, j) === 1 || this.check_if_red_bridge(i, j) === 1) {
+      console.log('bridge exsists!');
+      return;
+    }
+    if ( this.player === 1 ) {
+      console.log('i: ', i, 'j:', j);
+      // console.log(this.blueNodes.find(function(element) {
+      //   return element.i === i && element.j === j - 1 }))
+      let nodeAbove = this.getUpperNode(i, j);
+      let nodeLeft = this.getLeftNode(i, j);
+      console.log(nodeLeft);
+      if (nodeAbove && j !== 0 && j !== this.size * 2) {
+        console.log("navpicno");
+        this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i - 1, j), node2: this.getNodeId(i + 1, j)});
+      } else if(nodeLeft) {
+          console.log("vodoravno");
+          this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1) });
+      } else {
+        console.log('invalid!');
+      }
+    } else {
+
     }
   }
   check_if_blue_bridge(i: number, j: number) {
+    // check if bridge exsists in array
     if ( this.blueBridges.find(function(element) {
       return element.i === i && element.j === j})) {
-        return true;
+        return 1;
      } else {
-       return false;
+       return 2;
      }
   }
   check_if_red_bridge(i: number, j: number) {
+    // check if bridge exsists in array
     if ( this.redBridges.find(function(element) {
       return element.i === i && element.j === j})) {
-        return true;
+        return 1;
      } else {
-       return false;
+       return 2;
      }
   }
+  getLeftNode(i: number, j: number) {
+    return this.blueNodes.find(function(element) {
+      return element.i === i && element.j === j - 1});
+  }
+  getUpperNode(i: number, j: number) {
+    return this.blueNodes.find(function(element) {
+      return element.i === i - 1 && element.j === j});
+  }
+  getNodeId(i: number, j: number) {
+    let nodeId = this.blueNodes.find(function(element) {
+      return element.i === i && element.j === j});
+      console.log(nodeId);
+  }
+  checkIfPlayerWon(player: number) {
+    return true;
+    if (player === 1) {
+      // if()
+    } else {
+
+    }
+  }
   changePlayer() {
-    if(this.player === 1) {
+    if (this.player === 1) {
       this.player = 2;
     } else {
       this.player = 1;

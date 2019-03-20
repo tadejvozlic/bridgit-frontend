@@ -11,6 +11,7 @@
 // }
 .board {
   margin: 64px auto;
+  padding-top: 30px;
   width: 600px;
   height: 600px;
   background-color: whitesmoke;
@@ -26,11 +27,39 @@
   float: left;
 }
 .tile-content {
+  width: 25px;
+  height: 25px;
+  // outline: 1px solid;
+  float: right;
+}
+%bridge-horizontal {
+  width: 125px;
+  margin-right: -50px;
+}
+%bridge-vertical {
+  height: 125px;
+  margin-bottom: -50px;
+}
+.redBridge-horizontal {
+  @extend %bridge-horizontal;
+  background-color: red;
+}
+.redBridge-vertical {
+  @extend %bridge-vertical;
+  background-color: red;
+}
+.blueBridge-horizontal {
+  @extend %bridge-horizontal;
+  background-color: blue;
+}
+.blueBridge-vertical {
+  @extend %bridge-vertical;
+  background-color: blue;
 
-  float: left;
 }
 %node {
   border-radius: 50%;
+  // float: right;
 }
 .blueNode {
   @extend %node;
@@ -41,6 +70,8 @@
   background-color: red;
 }
 .blueBridge {
+  width: 75px;
+
   background-color: blue;
 }
 .redBridge {
