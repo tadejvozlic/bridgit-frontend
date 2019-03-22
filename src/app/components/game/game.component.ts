@@ -86,11 +86,6 @@ export class GameComponent implements OnInit {
   move(i: number, j: number) {
     if (!this.check_if_blue_node(i, j) && !this.check_if_red_node(i, j)) {
       this.addBridge(i, j, this.player);
-      // if (this.player === 1) {
-      //   this.blueBridges.push({'i':i,'j': j, 'node1':});
-      // } else {
-      //   this.redBridges.push({'i':i,'j': j});
-      // }
       if (this.checkIfPlayerWon(this.player)) {
       console.log('player', this.player, ' won');
     } else {
@@ -99,34 +94,46 @@ export class GameComponent implements OnInit {
     }
   }
   addBridge(i: number, j: number, player) {
-    if (this.check_if_blue_bridge(i, j) === 1 || this.check_if_red_bridge(i, j) === 1) {
+    if (this.check_if_blue_bridge(i, j) > 0 || this.check_if_red_bridge(i, j) > 0 ||
+     i === 0 || i === this.size * 2 || j === 0 || j === this.size * 2 ) {
       console.log('bridge exsists!');
       return;
     }
+    let nodeAbove = this.getUpperNode(i, j, player);
+    let nodeLeft = this.getLeftNode(i, j, player);
+    console.log("nodeleft:", nodeLeft, "nodeAbove: ", nodeAbove);
     if ( this.player === 1 ) {
       console.log('i: ', i, 'j:', j);
       // console.log(this.blueNodes.find(function(element) {
       //   return element.i === i && element.j === j - 1 }))
-      let nodeAbove = this.getUpperNode(i, j);
-      let nodeLeft = this.getLeftNode(i, j);
+
       console.log(nodeLeft);
+      //navpicno
       if (nodeAbove && j !== 0 && j !== this.size * 2) {
         console.log("navpicno");
-        this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i - 1, j), node2: this.getNodeId(i + 1, j)});
-      } else if(nodeLeft) {
-          console.log("vodoravno");
-          this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1) });
+        this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i, j - 1), node2: this.getNodeId(i, j + 1), direction: 'vertical'});
+        // vorodavno
       } else {
-        console.log('invalid!');
+          console.log("vodoravno");
+          this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
       }
     } else {
-
+      // navpicno
+      if( nodeAbove) {
+        this.redBridges.push({i: i, j: j, node1: this.getNodeId(i - 1, j), node2: this.getNodeId(i + 1, j), direction: 'vertical'});
+      } else {
+          this.redBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
+      }
     }
   }
   check_if_blue_bridge(i: number, j: number) {
-    // check if bridge exsists in array
-    if ( this.blueBridges.find(function(element) {
-      return element.i === i && element.j === j})) {
+    // check if bridge exsists in array 
+    let bridge = this.blueBridges.find( function (element) {
+      return element.i === i && element.j === j});
+    if(!bridge) {
+      return 0;
+    }
+    if ( bridge.direction == 'vertical' ) {
         return 1;
      } else {
        return 2;
@@ -138,24 +145,34 @@ export class GameComponent implements OnInit {
       return element.i === i && element.j === j})) {
         return 1;
      } else {
-       return 2;
+       return 0;
      }
   }
-  getLeftNode(i: number, j: number) {
+  getLeftNode(i: number, j: number, player) {
+    if(player === 1) {
     return this.blueNodes.find(function(element) {
       return element.i === i && element.j === j - 1});
+    } else {
+      return this.redNodes.find(function(element) {
+       return element.i === i && element.j === j - 1});
+    }
   }
-  getUpperNode(i: number, j: number) {
-    return this.blueNodes.find(function(element) {
-      return element.i === i - 1 && element.j === j});
+  getUpperNode(i: number, j: number, player) {
+    if (this.player === 1) {
+      return this.blueNodes.find(function(element) {
+        return element.i === i - 1 && element.j === j});
+    } else {
+      return this.redNodes.find(function(element) {
+        return element.i === i - 1 && element.j === j});
+    }
   }
   getNodeId(i: number, j: number) {
-    let nodeId = this.blueNodes.find(function(element) {
+    let node = this.blueNodes.find(function(element) {
       return element.i === i && element.j === j});
-      console.log(nodeId);
+      console.log(node.id);
   }
   checkIfPlayerWon(player: number) {
-    return true;
+    return false;
     if (player === 1) {
       // if()
     } else {
@@ -168,6 +185,7 @@ export class GameComponent implements OnInit {
     } else {
       this.player = 1;
     }
+    console.log("player", this.player, "'s move");
   }
   set_bridge(i: number, j: number) {
     console.log(i, j);

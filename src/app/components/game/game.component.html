@@ -3,11 +3,12 @@
     <div *ngFor="let i of 2*size + 1 | iterableNumber">
       <div class="tile" *ngFor="let j of 2*size + 1 | iterableNumber"  (click)="move(i,j)" >
       <div class="tile-content" [ngClass]="{
-        'blueNode': check_if_blue_node(i,j),
-        'redNode': check_if_red_node(i,j),
-        'blueBridge-horizontal': check_if_blue_bridge(i, j) === 1
+        'node-red red': check_if_red_node(i,j),
+        'node-blue blue': check_if_blue_node(i,j),
+        'bridge-red': check_if_red_bridge(i,j) !== 0,
+        'bridge-blue': check_if_blue_bridge(i,j) !== 0
       }">
-      <p style="align-text:right">{{i +  '/' + j}}</p>
+      <p style="align-text:right">{{i +  '/' + j}}</p> 
       </div>
       <!-- <p >{{blueCount}}</p> -->
       <!-- <p *ngIf="check_if_red_node(i,j)">{{redCount}}</p> -->
