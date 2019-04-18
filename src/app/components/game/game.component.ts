@@ -88,12 +88,11 @@ export class GameComponent implements OnInit {
       this.addBridge(i, j, this.player);
       if (this.checkIfPlayerWon(this.player)) {
       console.log('player', this.player, ' won');
-    } else {
-      this.changePlayer();
       }
     }
   }
   addBridge(i: number, j: number, player) {
+    console.log('i:', i, ' j:',j);
     if (this.check_if_blue_bridge(i, j) > 0 || this.check_if_red_bridge(i, j) > 0 ||
      i === 0 || i === this.size * 2 || j === 0 || j === this.size * 2 ) {
       console.log('bridge exsists!');
@@ -101,7 +100,7 @@ export class GameComponent implements OnInit {
     }
     let nodeAbove = this.getUpperNode(i, j, player);
     let nodeLeft = this.getLeftNode(i, j, player);
-    console.log("nodeleft:", nodeLeft, "nodeAbove: ", nodeAbove);
+    console.log('nodeleft:', nodeLeft, 'nodeAbove: ', nodeAbove);
     if ( this.player === 1 ) {
       console.log('i: ', i, 'j:', j);
       // console.log(this.blueNodes.find(function(element) {
@@ -110,11 +109,12 @@ export class GameComponent implements OnInit {
       console.log(nodeLeft);
       //navpicno
       if (nodeAbove && j !== 0 && j !== this.size * 2) {
-        console.log("navpicno");
+        console.log('navpicno');
         this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i, j - 1), node2: this.getNodeId(i, j + 1), direction: 'vertical'});
+        console.log(this.blueBridges);
         // vorodavno
       } else {
-          console.log("vodoravno");
+          console.log('vodoravno');
           this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
       }
     } else {
@@ -125,9 +125,11 @@ export class GameComponent implements OnInit {
           this.redBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
       }
     }
+    this.changePlayer();
+
   }
   check_if_blue_bridge(i: number, j: number) {
-    // check if bridge exsists in array 
+    // check if bridge exsists in array
     let bridge = this.blueBridges.find( function (element) {
       return element.i === i && element.j === j});
     if(!bridge) {
@@ -149,27 +151,29 @@ export class GameComponent implements OnInit {
      }
   }
   getLeftNode(i: number, j: number, player) {
-    if(player === 1) {
+    console.log("left node:", i ," ", j);
+    if (player === 1) {
     return this.blueNodes.find(function(element) {
-      return element.i === i && element.j === j - 1});
+      return element.i === i - 1 && element.j === j;});
     } else {
       return this.redNodes.find(function(element) {
-       return element.i === i && element.j === j - 1});
+       return element.i === i - 1 && element.j === j;});
     }
   }
   getUpperNode(i: number, j: number, player) {
     if (this.player === 1) {
       return this.blueNodes.find(function(element) {
-        return element.i === i - 1 && element.j === j});
+        return element.i === i && element.j === j - 1;});
     } else {
       return this.redNodes.find(function(element) {
-        return element.i === i - 1 && element.j === j});
+        return element.i === i && element.j === j - 1;});
     }
   }
   getNodeId(i: number, j: number) {
     let node = this.blueNodes.find(function(element) {
       return element.i === i && element.j === j});
       console.log(node.id);
+      return node.id;
   }
   checkIfPlayerWon(player: number) {
     return false;
