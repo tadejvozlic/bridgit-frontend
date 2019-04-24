@@ -22,6 +22,8 @@ export class GameComponent implements OnInit {
   redBridges;
   redCount;
   blueCount;
+  blueEndPointsIds;
+  redEndPointsIds;
   constructor() {
 
   }
@@ -38,6 +40,8 @@ export class GameComponent implements OnInit {
     this.redBridges = [];
     this.blueNodes = [];
     this.redNodes = [];
+    this.blueEndPointsIds = [];
+    this.redEndPointsIds = [];
     this.fillNodes();
   }
   getIndexes() {
@@ -49,19 +53,27 @@ export class GameComponent implements OnInit {
     for (let i = 0; i < 2 * this.size + 1; i++) {
       for (let j = 0; j < 2 * this.size + 1; j++) {
         if ((i + j) % 2 === 1 && j % 2 === 0 &&  i < 2 * this.size) {
+          // filling blue nodes
           this.blueNodes.push({
             'id': blueIndex,
             'i': i,
             'j': j
           });
+          if (j === 0 || j === 10) {
+            this.blueEndPointsIds.push(blueIndex);
+          }
           blueIndex ++;
         }
         if ((i + j) % 2 === 1 && j % 2 === 1 && j < 2 * this.size) {
+          // filling red nodes
           this.redNodes.push({
             'id': redIndex,
             'i': i,
             'j': j
           });
+          if (i === 0 || i === 10) {
+            this.redEndPointsIds.push(redIndex);
+          }
           redIndex ++;
         }
       }
@@ -135,7 +147,7 @@ export class GameComponent implements OnInit {
     if(!bridge) {
       return 0;
     }
-    if ( bridge.direction == 'vertical' ) {
+    if ( bridge.direction === 'vertical' ) {
         return 1;
      } else {
        return 2;
@@ -143,11 +155,15 @@ export class GameComponent implements OnInit {
   }
   check_if_red_bridge(i: number, j: number) {
     // check if bridge exsists in array
-    if ( this.redBridges.find(function(element) {
-      return element.i === i && element.j === j})) {
+    let bridge = this.redBridges.find( function (element) {
+      return element.i === i && element.j === j});
+    if(!bridge) {
+      return 0;
+    }
+    if ( bridge.direction === 'vertical' ) {
         return 1;
      } else {
-       return 0;
+       return 2;
      }
   }
   getLeftNode(i: number, j: number, player) {
@@ -176,10 +192,39 @@ export class GameComponent implements OnInit {
       return node.id;
   }
   checkIfPlayerWon(player: number) {
-    return false;
-    if (player === 1) {
-      // if()
+    let isWon = false;
+    if (player == 1) {
+      console.log(this.blueNodes, this.blueBridges, this.blueEndPointsIds);
+      this.blueBridges.forEach(bridge => {
+        if (this.blueEndPointsIds.includes(bridge.node1)) {
+          isWon = this.checkEndPointConnections(bridge.node1, player);
+          if(isWon = true) {
+            console.log('WON');
+            return true;
+          }
+        }
+      });
+      console.log('didnt win');
+      // let start = this.blueBridges.filter(bridge => return bridge. )
+      // checkEndPointConnections(this.blueEndPointsIds, player);
+      return false;
     } else {
+      return false;
+    }
+  }
+  checkEndPointConnections(node1_id, player: number) {
+    if(node1_id === undefined) {
+      return false;
+    }
+    // blue bridges
+    if (this.player === 1 ) {
+      let bridge = this.blueBridges.filter(bridge => { return bridge.node1 === node1_id});
+      if (this.blueEndPointsIds.includes(bridge.node2)) {
+        return true;
+      } else {
+        return this.checkEndPointConnections(bridge.node2, 1);
+      }
+    } else { // red bridges
 
     }
   }

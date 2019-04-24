@@ -5,10 +5,20 @@
       <div class="tile-content" [ngClass]="{
         'node-red red': check_if_red_node(i,j),
         'node-blue blue': check_if_blue_node(i,j),
-        'bridge-red': check_if_red_bridge(i,j) !== 0,
-        'bridge-blue': check_if_blue_bridge(i,j) !== 0
+        'bridge-red bridge-vertical': check_if_red_bridge(i,j)  === 1,
+        'bridge-red bridge-horizontal': check_if_red_bridge(i,j) === 2,
+        'bridge-blue bridge-vertical': check_if_blue_bridge(i,j) === 1,
+        'bridge-blue bridge-horizontal': check_if_blue_bridge(i,j) === 2
       }">
-      <p style="align-text:right">{{i +  '/' + j}}</p> 
+      <!-- <div class="tile-content" [ngClass]="{
+        'node-red red': check_if_red_node(i,j),
+        'node-blue blue': check_if_blue_node(i,j),
+        'bridge-red': check_if_red_bridge(i,j) !== 0,
+        'bridge-blue': check_if_blue_bridge(i,j) !== 0,
+        'bridge-vertical': check_if_blue_bridge(i,j) !== 0,
+        'bridge-horizontal': check_if_blue_bridge(i,j) !== 0
+      }"> -->
+      <p style="align-text:right">{{i +  '/' + j}}</p>
       </div>
       <!-- <p >{{blueCount}}</p> -->
       <!-- <p *ngIf="check_if_red_node(i,j)">{{redCount}}</p> -->
