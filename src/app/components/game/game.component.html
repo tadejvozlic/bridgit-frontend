@@ -2,14 +2,7 @@
   <div class="board">
     <div *ngFor="let i of 2*size + 1 | iterableNumber">
       <div class="tile" *ngFor="let j of 2*size + 1 | iterableNumber"  (click)="move(i,j)" >
-      <div class="tile-content" [ngClass]="{
-        'node-red red': check_if_red_node(i,j),
-        'node-blue blue': check_if_blue_node(i,j),
-        'bridge-red bridge-vertical': check_if_red_bridge(i,j)  === 1,
-        'bridge-red bridge-horizontal': check_if_red_bridge(i,j) === 2,
-        'bridge-blue bridge-vertical': check_if_blue_bridge(i,j) === 1,
-        'bridge-blue bridge-horizontal': check_if_blue_bridge(i,j) === 2
-      }">
+      <div class="tile-content" [ngClass]="get_class(i,j)">
       <!-- <div class="tile-content" [ngClass]="{
         'node-red red': check_if_red_node(i,j),
         'node-blue blue': check_if_blue_node(i,j),
