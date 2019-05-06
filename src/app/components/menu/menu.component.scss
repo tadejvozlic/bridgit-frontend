@@ -1,0 +1,24 @@
+.board {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 64px auto;
+    // padding-top: 30px;
+    width: 600px;
+    height: 600px;
+    background-color: whitesmoke;
+    text-align: center;
+    border: 1px solid;
+    border-radius: 6px;
+    box-shadow: 0 1px 6px, 0 1px 12px white;
+    flex-wrap:wrap;
+
+    .buttons {
+        width: 60%;
+        display: block;
+        div {
+            margin: 50px 0;
+            align-self: center;
+        }
+    }
+  }
