@@ -1,15 +1,20 @@
+.menu-right {
+  position: absolute;
+  top: 10px;
+  right:10px;
+}
 .board {
   display: flex;
   justify-content: center;
-  margin: 64px auto;
+  // margin: 64px auto;
   // padding-top: 30px;
-  width: 600px;
-  height: 600px;
-  background-color: whitesmoke;
+  width: inherit;
+  height: inherit;
+  // background-color: whitesmoke;
   text-align: center;
-  border: 1px solid;
-  border-radius: 6px;
-  box-shadow: 0 1px 6px, 0 1px 12px white;
+  // border: 1px solid;
+  // border-radius: 6px;
+  // box-shadow: 0 1px 6px, 0 1px 12px white;
   flex-wrap:wrap;
 }
 .tile {
@@ -62,10 +67,10 @@
 }
 .bridge-horizontal {
   color: green;
-  padding: 0 45px;
+  padding: 0 56px;
 }
 .bridge-vertical {
   color: green;
-  padding: 45px 0;
+  padding: 56px 0;
 }
 

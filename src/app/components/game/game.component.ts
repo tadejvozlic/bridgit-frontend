@@ -1,6 +1,9 @@
+import { BoardService } from './../../services/board.service';
+import { Router } from '@angular/router';
 import { HttpService } from './../../services/http.service';
 import { Component, OnInit } from '@angular/core';
-import { checkAndUpdateBinding } from '@angular/core/src/view/util';
+
+declare const Pusher: any;
 
 @Component({
   selector: 'app-game',
@@ -8,10 +11,6 @@ import { checkAndUpdateBinding } from '@angular/core/src/view/util';
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
-  // tslint:disable-next-line:variable-name
-  // greyBridges_blue = [];
-  // tslint:disable-next-line: variable-name
-  // greyBridges_red = [];
   size: number;
   player: number;
   startingPlayer: number;
@@ -26,14 +25,27 @@ export class GameComponent implements OnInit {
   blueCount;
   blueEndPointsIds;
   redEndPointsIds;
+  moves;
+  count;
+  full: boolean;
+  pusherChannel: any;
+  canPlay: boolean = true;
+  players: number = 0;
+  gameId: string;
+
   constructor(
-    private httpService: HttpService
+    private httpService: HttpService,
+    private boardService: BoardService,
+    private router: Router
   ) {
 
   }
 
   ngOnInit() {
     // console.log(Math.floor(4 / 6));
+    this.moves = [];
+    this.count = 0;
+    // this.setVictoryScreen(1);
     this.size = 5;
     this.nodeSize = 15;
     this.spaceBetween = 19;
@@ -46,12 +58,46 @@ export class GameComponent implements OnInit {
     this.blueEndPointsIds = [];
     this.redEndPointsIds = [];
     this.fillNodes();
-    this.setStartingPlayer();
+    // this.setStasrtingPlayer();
   }
-  getIndexes() {
-    console.log(this.blueEndPointsIds, this.redEndPointsIds);
+  initPusher(): GameComponent {
+    // findOrCreate unique channel ID
+    let id = this.getQueryParam('id');
+    if (!id) {
+      id = this.getUniqueId();
+      location.search = location.search ? '&id=' + id : 'id=' + id;
+    }
+    this.gameId = id;
+    // init pusher
+    const pusher = new Pusher('APP_KEY', {
+      authEndpoint: '/pusher/auth',
+      cluster: 'eu'
+    });
+    // bind to relevant channels
+    this.pusherChannel = pusher.subscribe(id);
+    this.pusherChannel.bind('pusher:member_added', member => { this.players++ })
+    this.pusherChannel.bind('pusher:subscription_succeeded', members => {
+      this.players = members.count;
+      // this.setPlayer(this.players);
+      console.log("connected");
+      // this.toastr.success("Success", 'Connected!');
+    });
+    this.pusherChannel.bind('pusher:member_removed', member => { this.players-- });
+
+    return this;
+  }
+
+  listenForChanges(): GameComponent {
+    this.pusherChannel.bind('player-move', (obj) => {
+      this.canPlay = !this.canPlay;
+      // this.boards[obj.boardId] = obj.board;
+      // this.boards[obj.player].player.score = obj.score;
+    });
+    console.log(this);
+    return this;
   }
   fillNodes() {
+    this.boardService.createBoard();
     let redIndex = 0;
     let blueIndex = 0;
     for (let i = 0; i < 2 * this.size + 1; i++) {
@@ -82,6 +128,15 @@ export class GameComponent implements OnInit {
         }
       }
     }
+    console.log("endpoints IDS:", this.blueEndPointsIds);
+  }
+  getQueryParam(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  }
+
+  getUniqueId () {
+    return 'presence-' + Math.random().toString(36).substr(2, 8);
   }
   check_if_blue_node(i: number, j: number) {
     if ( this.blueNodes.find(function(element) {
@@ -100,10 +155,13 @@ export class GameComponent implements OnInit {
      }
   }
   move(i: number, j: number) {
+    console.info('1');
     if (!this.check_if_blue_node(i, j) && !this.check_if_red_node(i, j)) {
       this.addBridge(i, j, this.player);
       if (this.checkIfPlayerWon(this.player)) {
         console.log('MOVE player won');
+      }else {
+      //  this.changePlayer();
       }
     }
   }
@@ -115,26 +173,41 @@ export class GameComponent implements OnInit {
     }
     let nodeAbove = this.getUpperNode(i, j, player);
     let nodeLeft = this.getLeftNode(i, j, player);
+    console.log("left:", nodeLeft, "above:", nodeAbove)
+    let node1;
+    let node2;
     if ( this.player === 1 ) {
       // console.log(this.blueNodes.find(function(element) {
       //   return element.i === i && element.j === j - 1 }))
       //navpicno
       if (nodeAbove && j !== 0 && j !== this.size * 2) {
+        node1 = this.getNodeId(i, j - 1);
+        node2 = this.getNodeId(i, j + 1);
+        console.log("navpicno", node1, node2);
         this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i, j - 1), node2: this.getNodeId(i, j + 1), direction: 'vertical'});
         // vorodavno
       } else {
-          this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
+        node1 = nodeLeft.id;
+        node2 = (nodeLeft.id + 6);
+        console.log("vodoravno", node1, node2);
+          this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 6), direction: 'horizontal' });
       }
     } else {
       // navpicno
-      if( nodeAbove) {
+      if ( nodeAbove) {
+        node1 = this.getNodeId(i - 1, j);
+        node2 = this.getNodeId(i + 1, j);
         this.redBridges.push({i: i, j: j, node1: this.getNodeId(i - 1, j), node2: this.getNodeId(i + 1, j), direction: 'vertical'});
       } else {
-          this.redBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
+        node1 = nodeLeft.id;
+        node2 = (nodeLeft.id + 1);
+        this.redBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
       }
     }
-    this.changePlayer();
-
+    console.log("moves", node1, node2);
+    this.moves.push({player: this.player, node1: node1, node2: node2});
+    console.log(this.moves);
+    console.info('2');
   }
   check_if_blue_bridge(i: number, j: number) {
     // check if bridge exsists in array
@@ -153,7 +226,7 @@ export class GameComponent implements OnInit {
     // check if bridge exsists in array
     let bridge = this.redBridges.find( function (element) {
       return element.i === i && element.j === j});
-    if(!bridge) {
+    if (!bridge) {
       return 0;
     }
     if ( bridge.direction === 'vertical' ) {
@@ -187,10 +260,8 @@ export class GameComponent implements OnInit {
   }
   checkIfPlayerWon(player: number) {
     if (player === 1) {
-      console.log(this.blueNodes, this.blueBridges, this.blueEndPointsIds);
       this.blueBridges.forEach(bridge => {
         if (this.blueEndPointsIds.includes(bridge.node1)) {
-          console.log('INCLUDES ENDPOInT! bridge with start id:', bridge.node1);
           if (this.checkEndPointConnections(bridge.node1, player)) {
             this.setVictoryScreen(player);
             return true;
@@ -202,8 +273,8 @@ export class GameComponent implements OnInit {
     } else {
       this.redBridges.forEach(bridge => {
         if (this.redEndPointsIds.includes(bridge.node1)) {
-          console.log('INCLUDES ENDPOInT! bridge with start id:', bridge.node1);
           if (this.checkEndPointConnections(bridge.node1, player)) {
+            this.setVictoryScreen(player);
             return true;
           }
         }
@@ -219,19 +290,20 @@ export class GameComponent implements OnInit {
     }
     // blue bridges
     if (this.player === 1 ) {
-      let bridge = this.blueBridges.filter(bridge => { return bridge.node1 === node1_id});
-      console.log(bridge[0]);
-      bridge = bridge[0];
-      if (bridge === undefined) {
+      let bridges = this.blueBridges.filter(bridge => bridge.node1 == node1_id);
+      console.log("BRIDGE:", bridges);
+      if (!bridges) {
         return false;
       }
-      if (this.blueEndPointsIds.includes(bridge.node2)) {
-        console.log("includes!!!!");
-        // this.setVictoryScreen(1);
-        return true;
-      } else {
-        return this.checkEndPointConnections(bridge.node2, 1);
-      }
+      bridges.forEach(bridge => {
+        if (this.blueEndPointsIds.includes(bridge.node2)) {
+          console.log("includes!!!!");
+          this.setVictoryScreen(1);
+          return true;
+        } else {
+          return this.checkEndPointConnections(bridge.node2, 1);
+        }
+      });
     } else { // red bridges
       let bridge = this.redBridges.filter(bridge => { return bridge.node1 === node1_id});
       bridge = bridge[0];
@@ -239,7 +311,7 @@ export class GameComponent implements OnInit {
         return false;
       }
       if (this.redEndPointsIds.includes(bridge.node2)) {
-        // this.setVictoryScreen(2);
+        this.setVictoryScreen(2);
         return true;
       } else {
         return this.checkEndPointConnections(bridge.node2, 2);
@@ -256,7 +328,7 @@ export class GameComponent implements OnInit {
   get_class(i: number, j: number) {
     if (this.check_if_red_node(i,j)) {
       return 'node-red red';
-    } else if (this.check_if_blue_node(i,j)) {
+    } else if (this.check_if_blue_node(i, j)) {
       return 'node-blue blue';
     }
     let bridge = this.redBridges.find( function (element) {
@@ -283,20 +355,32 @@ export class GameComponent implements OnInit {
         }
     }
   }
-  setStartingPlayer() {
-    const r = Math.floor(Math.random() * 2) + 1;
-    console.log(r);
-    this.player = r;
-    this.startingPlayer = r;
-    // alert('player ' + this.player + ' starts');
-  }
+  // setStartingPlayer() {
+  //   const r = Math.floor(Math.random() * 2) + 1;
+  //   console.log(r);
+  //   this.player = 1;
+  //   this.startingPlayer = r;
+  //   // alert('player ' + this.player + ' starts');
+  // }
   setVictoryScreen(player:number) {
-    console.log("victory");
-    alert('Player ' + player + 'won!');
-    console.log(this.blueBridges, this.redBridges);
-    // this.HttpService.postResults();
+    setTimeout(() => {
+      alert('Player ' + player + 'won!');
+    }, 100);
+    let matchID = this.router.url.split('/')[2];
+    this.httpService.postResults(matchID, this.moves).subscribe(res => {
+      console.log(res);
+    });
   }
-
+  quitGame() {
+    if (confirm('Are you sure?') === true) {
+      let url_array = this.router.url.split('/');
+      let id = url_array[url_array.length - 1];
+      console.log(id);
+      this.router.navigate(['/play']);
+      // this.httpService.quitGame(id).subscribe(()=> {
+      // })
+    }
+  }
   // createBoard() {
     //blue Nodes
     // for (let i = 0; i < this.size * (this.size + 1); i++) {

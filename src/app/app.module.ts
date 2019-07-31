@@ -10,6 +10,9 @@ import { IterableNumberPipe } from './pipes/iterable-number.pipe';
 import { MenuComponent } from './components/menu/menu.component';
 import { HttpClientModule } from '@angular/common/http';
 
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { BoardService } from './services/board.service';
+
 const routes: Routes = [
   { path: 'play', component: MenuComponent },
   { path: 'play/:id', component: GameComponent },
@@ -19,15 +22,16 @@ const routes: Routes = [
     AppComponent,
     GameComponent,
     IterableNumberPipe,
-    MenuComponent
+    MenuComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    NgbModule,
     RouterModule.forRoot(routes),
   ],
-  providers: [HttpService],
+  providers: [HttpService, BoardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

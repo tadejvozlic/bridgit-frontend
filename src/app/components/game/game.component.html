@@ -1,5 +1,14 @@
-<div class="container">
-  <div class="board">
+<div class="board">
+    <div *ngIf="players > 1">
+        <div class="notification is-danger">
+          Sorry, only 2 players can play at a time. You can start your own game by visiting <a href="{{ gameUrl }}">{{ gameUrl }}</a>
+        </div>
+      </div>
+
+      <div *ngIf="players < 2">
+        <h2>Waiting for 2nd user to join...</h2>
+        <h3 class="subtitle is-6">You can invite them with this link: {{ gameUrl }}?id={{ gameId }}. You can also open <a href="{{ gameUrl }}?id={{ gameId }}" target="_blank">this link</a> in a new browser, to play all by yourself.</h3>
+      </div>
     <div *ngFor="let i of 2*size + 1 | iterableNumber">
       <div class="tile" *ngFor="let j of 2*size + 1 | iterableNumber"  (click)="move(i,j)" >
       <div class="tile-content" [ngClass]="get_class(i,j)">
@@ -12,15 +21,12 @@
         'bridge-horizontal': check_if_blue_bridge(i,j) !== 0
       }"> -->
       <p style="align-text:right">{{i +  '/' + j}}</p>
+      <!-- <p style="align-text:right">{{id}}</p> -->
       </div>
       <!-- <p >{{blueCount}}</p> -->
       <!-- <p *ngIf="check_if_red_node(i,j)">{{redCount}}</p> -->
       </div>
     </div>
-  </div>
-  <!-- <canvas #canvas  height="800" width="800" id="board" >
-
-  </canvas> -->
   <!-- <ng-container *ngIf="blueNodes && redNodes">
       <div *ngFor="let blueNode of blueNodes; let i = index">
           <span class="node-blue"></span>
@@ -28,5 +34,8 @@
         </div>
   </ng-container> -->
 </div>
-<button (click)="getIndexes()">asasasas</button>
+<div class="menu-right">
+  <button class="btn btn-danger" (click)="quitGame()">Quit Game</button>
+</div>
+<!-- <button (click)="getIndexes()">asasasas</button> -->
 
