@@ -11,6 +11,8 @@ declare const Pusher: any;
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
+  gameUrl = 'http://localhost:4200/play/';
+  url = 'http://localhost:3000/api';
   size: number;
   player: number;
   startingPlayer: number;
@@ -29,9 +31,10 @@ export class GameComponent implements OnInit {
   count;
   full: boolean;
   pusherChannel: any;
-  canPlay: boolean = true;
+  canPlay: boolean = false;
   players: number = 0;
   gameId: string;
+  test;
 
   constructor(
     private httpService: HttpService,
@@ -59,42 +62,63 @@ export class GameComponent implements OnInit {
     this.redEndPointsIds = [];
     this.fillNodes();
     // this.setStasrtingPlayer();
+    this.initPusher();
+    this.listenForChanges();
   }
-  initPusher(): GameComponent {
+  initPusher() {
     // findOrCreate unique channel ID
     let id = this.getQueryParam('id');
+    console.log(id);
     if (!id) {
       id = this.getUniqueId();
       location.search = location.search ? '&id=' + id : 'id=' + id;
     }
+    console.log(location.search);
     this.gameId = id;
     // init pusher
-    const pusher = new Pusher('APP_KEY', {
-      authEndpoint: '/pusher/auth',
+    const pusher = new Pusher('da78def8fbbc41b098fd', {
+      authEndpoint: 'http://localhost:3000/pusher/auth',
       cluster: 'eu'
     });
     // bind to relevant channels
-    this.pusherChannel = pusher.subscribe(id);
+    console.log(id);
+    this.pusherChannel = pusher.subscribe(this.gameId);
+    console.log(this.pusherChannel);
     this.pusherChannel.bind('pusher:member_added', member => { this.players++ })
+
     this.pusherChannel.bind('pusher:subscription_succeeded', members => {
       this.players = members.count;
-      // this.setPlayer(this.players);
-      console.log("connected");
+      this.test = members;
+      this.setPlayer(this.players);
+      console.log("connected! number of players:", this.players);
       // this.toastr.success("Success", 'Connected!');
     });
-    this.pusherChannel.bind('pusher:member_removed', member => { this.players-- });
-
-    return this;
+    this.pusherChannel.bind('', member => { this.players--; });
+    // return this;
   }
 
-  listenForChanges(): GameComponent {
-    this.pusherChannel.bind('player-move', (obj) => {
+  listenForChanges() {
+    this.pusherChannel.bind('client-move', (obj) => {
+      console.log(obj);
+      this.player === 1 ? this.redBridges = obj : this.blueBridges = obj;
+      this.player === 1 ? this.checkIfPlayerWon(2) : this.checkIfPlayerWon(1);
+      // this.bridge
+      // this.move(obj)
       this.canPlay = !this.canPlay;
       // this.boards[obj.boardId] = obj.board;
       // this.boards[obj.player].player.score = obj.score;
     });
-    console.log(this);
-    return this;
+    console.log("listening for changes");
+  }
+  setPlayer(players:number = 0) {
+    this.player = players;
+    if (players === 1) {
+      this.canPlay = true;
+    } else if (players === 2) {
+      this.canPlay = false;
+    }
+    console.info('PLAYER: ', this.player);
+    // alert('player:' + this.player + 'starts!');
   }
   fillNodes() {
     this.boardService.createBoard();
@@ -128,7 +152,7 @@ export class GameComponent implements OnInit {
         }
       }
     }
-    console.log("endpoints IDS:", this.blueEndPointsIds);
+    // console.log("endpoints IDS:", this.blueEndPointsIds);
   }
   getQueryParam(name) {
     var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
@@ -155,41 +179,47 @@ export class GameComponent implements OnInit {
      }
   }
   move(i: number, j: number) {
-    console.info('1');
-    if (!this.check_if_blue_node(i, j) && !this.check_if_red_node(i, j)) {
-      this.addBridge(i, j, this.player);
-      if (this.checkIfPlayerWon(this.player)) {
-        console.log('MOVE player won');
-      }else {
-      //  this.changePlayer();
+    // console.info('1');
+    if (this.canPlay) {
+      if (!this.check_if_blue_node(i, j) && !this.check_if_red_node(i, j)) {
+        this.addBridge(i, j, this.player);
+        this.checkIfPlayerWon(this.player) ;
+          // console.log('MOVE player won');
+        
       }
+      this.pusherChannel.trigger('client-move',
+      this.player === 1 ? this.blueBridges : this.redBridges );
+      
     }
+    
+      this.changePlayer();
+    
   }
   addBridge(i: number, j: number, player) {
     if (this.check_if_blue_bridge(i, j) > 0 || this.check_if_red_bridge(i, j) > 0 ||
      i === 0 || i === this.size * 2 || j === 0 || j === this.size * 2 ) {
-      console.log('bridge exsists!');
+      // console.log('bridge exsists!');
       return;
     }
     let nodeAbove = this.getUpperNode(i, j, player);
     let nodeLeft = this.getLeftNode(i, j, player);
-    console.log("left:", nodeLeft, "above:", nodeAbove)
+    // console.log("left:", nodeLeft, "above:", nodeAbove)
     let node1;
     let node2;
     if ( this.player === 1 ) {
-      // console.log(this.blueNodes.find(function(element) {
+      // // console.log(this.blueNodes.find(function(element) {
       //   return element.i === i && element.j === j - 1 }))
       //navpicno
       if (nodeAbove && j !== 0 && j !== this.size * 2) {
         node1 = this.getNodeId(i, j - 1);
         node2 = this.getNodeId(i, j + 1);
-        console.log("navpicno", node1, node2);
+        // console.log("navpicno", node1, node2);
         this.blueBridges.push({i: i, j: j, node1: this.getNodeId(i, j - 1), node2: this.getNodeId(i, j + 1), direction: 'vertical'});
         // vorodavno
       } else {
         node1 = nodeLeft.id;
         node2 = (nodeLeft.id + 6);
-        console.log("vodoravno", node1, node2);
+        // console.log("vodoravno", node1, node2);
           this.blueBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 6), direction: 'horizontal' });
       }
     } else {
@@ -204,10 +234,13 @@ export class GameComponent implements OnInit {
         this.redBridges.push({i: i, j: j, node1: nodeLeft.id, node2: (nodeLeft.id + 1), direction: 'horizontal' });
       }
     }
-    console.log("moves", node1, node2);
+    // console.log("moves", node1, node2);
     this.moves.push({player: this.player, node1: node1, node2: node2});
-    console.log(this.moves);
-    console.info('2');
+    // console.log(this.moves);
+    // console.info('2');
+    console.log("bluebridges:", this.blueBridges);
+    console.log("redbridges:", this.redBridges);
+
   }
   check_if_blue_bridge(i: number, j: number) {
     // check if bridge exsists in array
@@ -268,7 +301,7 @@ export class GameComponent implements OnInit {
           }
         }
       });
-      console.log('didnt win');
+      // console.log('didnt win');
       return false;
     } else {
       this.redBridges.forEach(bridge => {
@@ -283,21 +316,21 @@ export class GameComponent implements OnInit {
     }
   }
   checkEndPointConnections(node1_id, player: number) {
-    console.log('checking endpoints', node1_id, player);
+    // console.log('checking endpoints', node1_id, player);
     if (node1_id === undefined) {
-      console.log('false');
+      // console.log('false');
       return false;
     }
     // blue bridges
-    if (this.player === 1 ) {
+    if (player === 1 ) {
       let bridges = this.blueBridges.filter(bridge => bridge.node1 == node1_id);
-      console.log("BRIDGE:", bridges);
+      // console.log("BRIDGE:", bridges);
       if (!bridges) {
         return false;
       }
       bridges.forEach(bridge => {
         if (this.blueEndPointsIds.includes(bridge.node2)) {
-          console.log("includes!!!!");
+          // console.log("includes!!!!");
           this.setVictoryScreen(1);
           return true;
         } else {
@@ -319,11 +352,7 @@ export class GameComponent implements OnInit {
     }
   }
   changePlayer() {
-    if (this.player === 1) {
-      this.player = 2;
-    } else {
-      this.player = 1;
-    }
+    this.canPlay = false;
   }
   get_class(i: number, j: number) {
     if (this.check_if_red_node(i,j)) {
@@ -365,6 +394,7 @@ export class GameComponent implements OnInit {
   setVictoryScreen(player:number) {
     setTimeout(() => {
       alert('Player ' + player + 'won!');
+      this.canPlay = false;
     }, 100);
     let matchID = this.router.url.split('/')[2];
     this.httpService.postResults(matchID, this.moves).subscribe(res => {

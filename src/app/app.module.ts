@@ -14,8 +14,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BoardService } from './services/board.service';
 
 const routes: Routes = [
-  { path: 'play', component: MenuComponent },
-  { path: 'play/:id', component: GameComponent },
+  { path: 'play', component: GameComponent },
 ];
 @NgModule({
   declarations: [
