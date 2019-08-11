@@ -397,9 +397,12 @@ export class GameComponent implements OnInit {
       this.canPlay = false;
     }, 100);
     let matchID = this.router.url.split('/')[2];
-    this.httpService.postResults(matchID, this.moves).subscribe(res => {
-      console.log(res);
-    });
+    // only winning player posts results so it doesn't post twice
+    if (player === this.player) {
+      this.httpService.postResults(matchID, this.moves).subscribe(res => {
+        console.log(res);
+      });
+    }
   }
   quitGame() {
     if (confirm('Are you sure?') === true) {
