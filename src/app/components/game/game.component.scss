@@ -6,15 +6,9 @@
 .board {
   display: flex;
   justify-content: center;
-  // margin: 64px auto;
-  // padding-top: 30px;
   width: inherit;
   height: inherit;
-  // background-color: whitesmoke;
   text-align: center;
-  // border: 1px solid;
-  // border-radius: 6px;
-  // box-shadow: 0 1px 6px, 0 1px 12px white;
   flex-wrap:wrap;
 }
 .tile {
@@ -26,15 +20,10 @@
   -ms-flex-line-pack: center;
   align-content: center;
   flex-wrap:wrap;
-  // outline: 1px solid;
-  // float: left;
 }
 .tile-content {
   width: 25px;
   height: 25px;
-  // -webkit-align-content: center;
-  // -ms-flex-line-pack: center;
-  // align-content: center;
   justify-content: center;
   flex-wrap:wrap;
 }
@@ -44,15 +33,6 @@
 .node-red {
   border-radius: 50%;
 }
-// .bridge-horizontal {
-//   width: 125px;
-//   // margin-right: -50px;
-// }
-// .bridge-vertical {
-//   // height: 125px;
-//     border-radius: 50%;
-//   // margin-bottom: -50px;
-// }
 .bridge-blue {
   background-color: blue;
 }

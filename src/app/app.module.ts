@@ -7,7 +7,6 @@ import { AppComponent } from './app.component';
 import { GameComponent } from './components/game/game.component';
 import { RouterModule, Routes } from '@angular/router';
 import { IterableNumberPipe } from './pipes/iterable-number.pipe';
-import { MenuComponent } from './components/menu/menu.component';
 import { HttpClientModule } from '@angular/common/http';
 
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -21,7 +20,6 @@ const routes: Routes = [
     AppComponent,
     GameComponent,
     IterableNumberPipe,
-    MenuComponent,
   ],
   imports: [
     BrowserModule,

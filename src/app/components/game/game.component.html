@@ -6,8 +6,8 @@
 </div>
 <div *ngIf="players < 2">
   <h2>Waiting for 2nd user to join...</h2>
-  <h3 class="subtitle is-6">You can invite them with this link: {{ gameUrl }}?id={{ gameId }}. You can also open <a
-      href="{{ gameUrl }}?id={{ gameId }}" target="_blank">this link</a> in a new browser, to play all by yourself.</h3>
+  <h4 class="subtitle is-6">You can invite them with this link: <a
+      href="{{ gameUrl }}?id={{ gameId }}" target="_blank">{{ gameUrl }}?id={{ gameId }}</a></h4>
 </div>
 <div *ngIf="players === 2" class="playable">
   <div class="alert alert-success" *ngIf="canPlay">Your turn!</div>
@@ -17,29 +17,10 @@
   <div *ngFor="let i of 2*size + 1 | iterableNumber">
     <div class="tile" *ngFor="let j of 2*size + 1 | iterableNumber" (click)="move(i,j)">
       <div class="tile-content" [ngClass]="get_class(i,j)">
-        <!-- <div class="tile-content" [ngClass]="{
-        'node-red red': check_if_red_node(i,j),
-        'node-blue blue': check_if_blue_node(i,j),
-        'bridge-red': check_if_red_bridge(i,j) !== 0,
-        'bridge-blue': check_if_blue_bridge(i,j) !== 0,
-        'bridge-vertical': check_if_blue_bridge(i,j) !== 0,
-        'bridge-horizontal': check_if_blue_bridge(i,j) !== 0
-      }"> -->
-        <!-- <p style="align-text:right">{{i +  '/' + j}}</p> -->
-        <!-- <p style="align-text:right">{{id}}</p> -->
       </div>
-      <!-- <p >{{blueCount}}</p> -->
-      <!-- <p *ngIf="check_if_red_node(i,j)">{{redCount}}</p> -->
     </div>
   </div>
-  <!-- <ng-container *ngIf="blueNodes && redNodes">
-      <div *ngFor="let blueNode of blueNodes; let i = index">
-          <span class="node-blue"></span>
-
-        </div>
-  </ng-container> -->
 </div>
 <div class="menu-right">
   <button class="btn btn-danger" (click)="quitGame()">Quit Game</button>
 </div>
-<!-- <button (click)="getIndexes()">asasasas</button> -->

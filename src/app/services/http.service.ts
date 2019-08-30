@@ -8,31 +8,19 @@ import { of } from 'rxjs';
   providedIn: 'root'
 })
 export class HttpService {
-  url: string = 'http://localhost:3000/api/';
+  url = 'http://localhost:3000/api/';
   mq: Subject<any>;
   constructor(
     private http: HttpClient,
   ) { }
 
-  newGame() {
-    return this.http.post(this.url + 'newGame', 'test');
-  }
-  joinGame() {
-    return this.http.get(this.url + 'pendingGames');
-  }
-  quitGame(id) {
-    return this.http.post(this.url + 'quitGame', id);
-  }
-  postResults(matchID, moves):Observable<any> {
-    console.log(matchID, moves, this.url + 'postResults');
-    return this.http.post(this.url + 'postResults', { 'id': matchID, 'moves': moves })
+  postResults(matchID, moves): Observable<any> {
+    return this.http.post(this.url + 'postResults', { id: matchID, moves })
     .pipe(
-      map((res) => { //text, err, exchange_name, status:bool
-        console.log("sent!", res);
+      map((res) => {
         return res;
       }),
       catchError((err: HttpErrorResponse) => {
-        console.log('error', err);
         return of(err);
       }),
     );
